@@ -142,6 +142,7 @@ If the frontend can't connect to your backend:
 1. Update the API proxy in `vite.config.ts` (for local dev)
 2. Set the `VITE_API_URL` environment variable in Vercel dashboard
 3. Ensure CORS is properly configured on your backend
+4. Verify your Supabase instance is running and accessible
 
 ## 📝 Notes
 

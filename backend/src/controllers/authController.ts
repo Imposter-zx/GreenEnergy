@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
+import { AuthRequest } from '../middleware/auth';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { PrismaClient } from '@prisma/client';
+import { createUser as createSupabaseUser, findUserByEmail, findUserById, updateProfile as updateSupabaseProfile } from '../services/supabaseService';
 
-const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey';
 const COOKIE_OPTIONS = {
     httpOnly: true,
@@ -16,26 +16,17 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     try {
         const { email, password, role, name } = req.body;
 
-        const existingUser = await prisma.user.findUnique({ where: { email } });
+        const existingUser = await findUserByEmail(email);
         if (existingUser) {
             return res.status(400).json({ message: 'User already exists' });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const user = await prisma.user.create({
-            data: {
-                email,
-                password: hashedPassword,
-                role: role || 'INDIVIDUAL',
-                profile: {
-                    create: {
-                        name: name || '',
-                    },
-                },
-            },
-            include: {
-                profile: true,
-            },
+        const user = await createSupabaseUser({
+            email,
+            password: hashedPassword,
+            role: role || 'INDIVIDUAL',
+            name: name || '',
         });
 
         const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET, { expiresIn: '24h' });
@@ -53,10 +44,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     try {
         const { email, password } = req.body;
 
-        const user = await prisma.user.findUnique({
-            where: { email },
-            include: { profile: true },
-        });
+        const user = await findUserByEmail(email);
 
         if (!user) {
             return res.status(400).json({ message: 'Invalid credentials' });
@@ -83,13 +71,10 @@ export const logout = async (req: Request, res: Response) => {
     res.json({ message: 'Logged out successfully' });
 };
 
-export const getProfile = async (req: any, res: Response) => {
+export const getProfile = async (req: AuthRequest, res: Response) => {
     try {
-        const userId = req.user.userId;
-        const user = await prisma.user.findUnique({
-            where: { id: userId },
-            include: { profile: true },
-        });
+        const userId = req.user!.userId;
+        const user = await findUserById(userId);
 
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
@@ -102,15 +87,12 @@ export const getProfile = async (req: any, res: Response) => {
     }
 };
 
-export const updateProfile = async (req: any, res: Response) => {
+export const updateProfile = async (req: AuthRequest, res: Response) => {
     try {
-        const userId = req.user.userId;
+        const userId = req.user!.userId;
         const { name, bio, location } = req.body;
         
-        const profile = await prisma.profile.update({
-            where: { userId },
-            data: { name, bio, location }
-        });
+        const profile = await updateSupabaseProfile(userId, { name, bio, location });
         
         res.json(profile);
     } catch (error) {

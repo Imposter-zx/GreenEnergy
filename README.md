@@ -11,8 +11,9 @@ The platform has been recently refactored to meet industry standards for securit
   - Migrated JWT storage from localStorage to **HttpOnly, SameSite cookies**.
   - Implemented **CSRF Protection** (Custom Header Strategy).
   - Integrated **Helmet** middleware for security headers.
-- **Performance Optimization**: Optimized Prisma queries with database-level aggregations (SUM/GroupBy).
+- **Performance Optimization**: Optimized database queries with Supabase-level aggregations.
 - **Global Error Handling**: Centralized error management in the Express backend.
+- **Database Migration**: Migrated from Prisma ORM to **Supabase** for improved developer experience and real-time capabilities.
 
 ## 🌟 Key Features
 
@@ -32,11 +33,13 @@ GreenEnergy/
 │   │   ├── api/      # Centralized Axios instance
 │   │   ├── context/  # Cookie-based Auth state
 │   │   └── pages/    # Modernized with React Query
-├── backend/           # Node.js + Express + Prisma + PostgreSQL
+├── backend/           # Node.js + Express + Supabase + PostgreSQL
 │   ├── src/
 │   │   ├── middleware/# Security & Auth logic
 │   │   ├── controllers/# Refactored with Global Error Handling
-│   └── prisma/        # Schema & Seeds
+│   │   ├── lib/      # Supabase client initialization
+│   │   └── services/ # Supabase data access layer
+├── supabase_schema.sql # Database schema for Supabase
 └── package.json       # Monorepo task runner
 ```
 
@@ -55,8 +58,8 @@ GreenEnergy/
 
 - **Node.js**
 - **Express**
-- **Prisma ORM**
-- **PostgreSQL**
+- **Supabase** - PostgreSQL database with real-time capabilities
+- **PostgreSQL** (via Supabase)
 - **JWT + HttpOnly Cookies** - Secure authentication
 - **Helmet & Cookie-Parser** - Middleware
 
@@ -73,18 +76,19 @@ GreenEnergy/
 
 1. **Clone & Install**:
 
-   ```bash
-   git clone https://github.com/Imposter-zx/GreenEnergy.git
-   cd GreenEnergy
-   npm install        # Installs backend dependencies
-   cd frontend && npm install # Installs frontend dependencies
-   ```
+    ```bash
+    git clone https://github.com/Imposter-zx/GreenEnergy.git
+    cd GreenEnergy
+    npm install        # Installs backend dependencies
+    cd frontend && npm install # Installs frontend dependencies
+    ```
 
 2. **Environment Setup**:
    Create a `.env` file in the root:
 
    ```env
-   DATABASE_URL="postgresql://user:password@localhost:5432/db"
+   SUPABASE_URL="your-supabase-project-url"
+   SUPABASE_ANON_KEY="your-supabase-anon-key"
    JWT_SECRET="your-secure-secret"
    FRONTEND_URL="http://localhost:5173"
    PORT=5000
@@ -93,8 +97,7 @@ GreenEnergy/
 
 3. **Database Initialization**:
    ```bash
-   npx prisma generate --schema=backend/prisma/schema.prisma
-   npx prisma migrate dev --name init
+   # Execute the SQL in supabase_schema.sql in your Supabase dashboard
    npm run seed       # Populate with initial demo data
    ```
 

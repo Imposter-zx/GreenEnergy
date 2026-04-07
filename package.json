@@ -7,22 +7,22 @@
     "start-backend": "nodemon backend/src/index.ts",
     "start-frontend": "cd frontend && npm run dev",
     "build": "cd frontend && npm install && npm run build",
-    "build:backend": "npx prisma generate --schema=backend/prisma/schema.prisma && tsc",
+    "build:backend": "tsc",
     "start": "node dist/backend/src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "seed": "ts-node backend/prisma/seed.ts"
+    "seed": "ts-node backend/seed.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "@prisma/client": "^6.2.1",
+    "@supabase/supabase-js": "^2.102.1",
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "date-fns": "^4.1.0",
-    "dotenv": "^16.4.7",
+    "dotenv": "^16.6.1",
     "express": "^5.2.1",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
@@ -38,7 +38,6 @@
     "@types/pdfkit": "^0.13.9",
     "concurrently": "^9.1.2",
     "nodemon": "^3.1.11",
-    "prisma": "^6.2.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   }
